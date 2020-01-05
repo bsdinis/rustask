@@ -18,7 +18,7 @@ pub enum Priority {
     Note,
 }
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct Task {
     pub descript: String,
     pub priority: Option<Priority>,
@@ -100,6 +100,12 @@ impl Ord for Task {
         } else {
             self_pri.cmp(&other_pri)
         }
+    }
+}
+
+impl PartialOrd for Task {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
