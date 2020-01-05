@@ -1,7 +1,10 @@
 mod commands;
 use clap::{App, Arg, SubCommand};
 use commands::task;
-use std::path::Path;
+use std::{
+    path::Path,
+    env
+};
 
 fn main() -> Result<(), commands::error::Error> {
     let matches = App::new("rustask")
@@ -62,11 +65,18 @@ fn main() -> Result<(), commands::error::Error> {
         )
         .get_matches();
 
-    let path = Path::new(
-        matches
-            .value_of("file")
-            .unwrap_or("/home/bsd/.config/rustask/tasks"),
-    );
+    if !matches.is_present("file") && env::var("RUSTASK_TASKFILE").is_err() {
+        eprintln!("Could not find rustask file");
+        eprintln!("Maybe set RUSTASK_TASKFILE env var or pass in -f flag");
+    }
+
+    let task_location = if matches.is_present("file") {
+        matches.value_of("file").unwrap().to_string()
+    } else {
+        env::var("RUSTASK_TASKFILE").unwrap()
+    }
+    ;
+    let path = Path::new(&task_location);
 
     match matches.subcommand_name() {
         Some("list") | Some("l") => commands::list(path)?,
