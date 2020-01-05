@@ -1,6 +1,6 @@
 mod commands;
-use commands::task;
 use clap::{App, Arg, SubCommand};
+use commands::task;
 use std::path::Path;
 
 fn main() -> Result<(), commands::error::Error> {
@@ -25,29 +25,29 @@ fn main() -> Result<(), commands::error::Error> {
                     Arg::with_name("task")
                         .help("the task to be added")
                         .index(1)
-                        .required(true)
+                        .required(true),
                 )
                 .arg(
                     Arg::with_name("priority")
                         .help("priority for the task")
                         .takes_value(true)
-                        .short("-p")
+                        .short("-p"),
                 ),
         )
         .subcommand(
             SubCommand::with_name("add")
-            .help("Add a task")
-            .arg(
-                Arg::with_name("task")
+                .help("Add a task")
+                .arg(
+                    Arg::with_name("task")
                         .help("the task to be added")
                         .index(1)
-                        .required(true)
+                        .required(true),
                 )
                 .arg(
                     Arg::with_name("priority")
                         .help("priority for the task")
                         .takes_value(true)
-                        .short("-p")
+                        .short("-p"),
                 ),
         )
         .subcommand(

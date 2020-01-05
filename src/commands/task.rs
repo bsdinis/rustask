@@ -5,10 +5,11 @@
 //use chrono::prelude::*;
 use colored::*;
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Ord, PartialOrd)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
     Urgent,
     High,
@@ -17,10 +18,10 @@ pub enum Priority {
     Note,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, PartialOrd, Ord)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd)]
 pub struct Task {
-    pub priority: Option<Priority>,
     pub descript: String,
+    pub priority: Option<Priority>,
     //deadline: Option<DateTime<Utc>>,
 }
 
@@ -85,11 +86,22 @@ impl FromStr for Priority {
             "normal" => Ok(Priority::Normal),
             "low" => Ok(Priority::Low),
             "note" => Ok(Priority::Note),
-            _ => Err(ParsePriorityError{})
+            _ => Err(ParsePriorityError {}),
         }
     }
 }
 
+impl Ord for Task {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let self_pri = self.priority.as_ref().unwrap_or(&Priority::Normal);
+        let other_pri = other.priority.as_ref().unwrap_or(&Priority::Normal);
+        if self_pri == other_pri {
+            self.descript.cmp(&other.descript)
+        } else {
+            self_pri.cmp(&other_pri)
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
