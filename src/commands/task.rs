@@ -3,11 +3,12 @@
 // define task type
 
 //use chrono::prelude::*;
-use serde::{ Serialize, Deserialize };
 use colored::*;
+use serde::{Deserialize, Serialize};
 use std::fmt;
+use std::str::FromStr;
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, Ord, PartialOrd)]
 pub enum Priority {
     Urgent,
     High,
@@ -16,24 +17,24 @@ pub enum Priority {
     Note,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Debug, PartialOrd, Ord)]
 pub struct Task {
-    pub descript: String,
     pub priority: Option<Priority>,
+    pub descript: String,
     //deadline: Option<DateTime<Utc>>,
 }
 
 pub fn make_task(description: String, priority: Priority) -> Task {
     Task {
-        descript : description,
-        priority : Some(priority),
+        descript: description,
+        priority: Some(priority),
     }
 }
 
 pub fn make_default_task(description: String) -> Task {
     Task {
-        descript : description,
-        priority : None
+        descript: description,
+        priority: None,
     }
 }
 
@@ -42,7 +43,7 @@ pub fn make_default_task(description: String) -> Task {
 /// # Examples
 ///
 /// ```
-/// use rustask::task::*;
+/// use rustask::commands::task::*;
 /// let task = make_task("task".to_string(), Priority::Urgent);
 /// assert_eq!(task_f(&task), true);
 /// ```
@@ -69,6 +70,22 @@ impl fmt::Display for Task {
             Some(Priority::Low) => write!(f, "{}", self.descript.green()),
             Some(Priority::Note) => write!(f, "{}", self.descript.cyan()),
             None => write!(f, "{}", self.descript.bold()),
+        }
+    }
+}
+
+pub struct ParsePriorityError {}
+
+impl FromStr for Priority {
+    type Err = ParsePriorityError;
+    fn from_str(s: &str) -> Result<Self, ParsePriorityError> {
+        match s.to_lowercase().as_str() {
+            "urgent" => Ok(Priority::Urgent),
+            "high" => Ok(Priority::High),
+            "normal" => Ok(Priority::Normal),
+            "low" => Ok(Priority::Low),
+            "note" => Ok(Priority::Note),
+            _ => Err(ParsePriorityError{})
         }
     }
 }
