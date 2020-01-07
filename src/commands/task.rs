@@ -25,17 +25,12 @@ pub struct Task {
     //deadline: Option<DateTime<Utc>>,
 }
 
-pub fn make_task(description: String, priority: Priority) -> Task {
-    Task {
-        descript: description,
-        priority: Some(priority),
-    }
-}
-
-pub fn make_default_task(description: String) -> Task {
-    Task {
-        descript: description,
-        priority: None,
+impl Task {
+    pub fn new(descript: String, priority: Option<Priority>) -> Task {
+        Task {
+            descript: descript,
+            priority: priority
+        }
     }
 }
 
@@ -45,7 +40,7 @@ pub fn make_default_task(description: String) -> Task {
 ///
 /// ```
 /// use rustask::commands::task::*;
-/// let task = make_task("task".to_string(), Priority::Urgent);
+/// let task = Task::new("task".to_string(), Some(Priority::Urgent));
 /// assert_eq!(task_f(&task), true);
 /// ```
 pub fn task_f(task: &Task) -> bool {
@@ -114,7 +109,7 @@ mod tests {
     use super::*;
     #[test]
     fn urgent_task_display() {
-        let task = make_task("urgent task".to_string(), Priority::Urgent);
+        let task = Task::new("urgent task".to_string(), Some(Priority::Urgent));
         assert_eq!(
             format!("Urgent Task: {}", task),
             format!("Urgent Task: {}", "urgent task".red().bold()),
@@ -123,7 +118,7 @@ mod tests {
 
     #[test]
     fn high_task_display() {
-        let task = make_task("high task".to_string(), Priority::High);
+        let task = Task::new("high task".to_string(), Some(Priority::High));
         assert_eq!(
             format!("High Task: {}", task),
             format!("High Task: {}", "high task".red()),
@@ -132,7 +127,7 @@ mod tests {
 
     #[test]
     fn normal_task_display() {
-        let task = make_task("normal task".to_string(), Priority::Normal);
+        let task = Task::new("normal task".to_string(), Some(Priority::Normal));
         assert_eq!(
             format!("Normal Task: {}", task),
             format!("Normal Task: {}", "normal task".yellow()),
@@ -141,7 +136,7 @@ mod tests {
 
     #[test]
     fn low_task_display() {
-        let task = make_task("low task".to_string(), Priority::Low);
+        let task = Task::new("low task".to_string(), Some(Priority::Low));
         assert_eq!(
             format!("Low Task: {}", task),
             format!("Low Task: {}", "low task".green()),
@@ -150,7 +145,7 @@ mod tests {
 
     #[test]
     fn note_display() {
-        let task = make_task("note".to_string(), Priority::Note);
+        let task = Task::new("note".to_string(), Some(Priority::Note));
         assert_eq!(
             format!("Note: {}", task),
             format!("Note: {}", "note".cyan()),
@@ -159,7 +154,7 @@ mod tests {
 
     #[test]
     fn default_display() {
-        let task = make_default_task("default".to_string());
+        let task = Task::new("default".to_string(), None);
         assert_eq!(
             format!("Default: {}", task),
             format!("Default: {}", "default".bold()),
@@ -168,13 +163,13 @@ mod tests {
 
     #[test]
     fn urgent_filter() {
-        let task = make_task("task".to_string(), Priority::Urgent);
+        let task = Task::new("task".to_string(), Some(Priority::Urgent));
         assert_eq!(task_f(&task), true);
     }
 
     #[test]
     fn high_filter() {
-        let task = make_task("task".to_string(), Priority::High);
+        let task = Task::new("task".to_string(), Some(Priority::High));
         assert_eq!(task_f(&task), true);
     }
 }

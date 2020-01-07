@@ -93,14 +93,14 @@ fn main() -> Result<(), commands::error::Error> {
 
             if let Some(priority_str) = sub_matches.value_of("priority") {
                 if let Ok(priority) = priority_str.parse::<task::Priority>() {
-                    let task = task::make_task(task_descript, priority);
+                    let task = task::Task::new(task_descript, Some(priority));
                     commands::add_task(path, task)?;
                 } else {
                     eprintln!("{} is an invalid priority value", priority_str);
                     eprintln!("choose on of: urgent, high, normal, low, note")
                 }
             } else {
-                let task = task::make_default_task(task_descript);
+                let task = task::Task::new(task_descript, None);
                 commands::add_task(path, task)?;
             }
         }

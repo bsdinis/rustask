@@ -30,12 +30,12 @@ mod tests {
     fn store_load() {
         let path = Path::new("test_file");
         let mut tasks = vec![
-            task::make_task("urgent".to_string(), task::Priority::Urgent),
-            task::make_task("high2".to_string(), task::Priority::High),
-            task::make_task("normal".to_string(), task::Priority::Normal),
-            task::make_task("low".to_string(), task::Priority::Low),
-            task::make_task("note".to_string(), task::Priority::Note),
-            task::make_default_task("default".to_string()),
+            task::Task::new("urgent".to_string(), Some(task::Priority::Urgent)),
+            task::Task::new("high2".to_string(), Some(task::Priority::High)),
+            task::Task::new("normal".to_string(), Some(task::Priority::Normal)),
+            task::Task::new("low".to_string(), Some(task::Priority::Low)),
+            task::Task::new("note".to_string(), Some(task::Priority::Note)),
+            task::Task::new("default".to_string(), None),
         ];
         tasks.sort();
 
