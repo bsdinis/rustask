@@ -124,8 +124,7 @@ fn main() -> Result<(), commands::error::Error> {
                 let priority = sub_matches.value_of("priority")
                     .and_then(|p_str| p_str.parse::<task::Priority>().ok());
 
-                println!("Editing task {}; new priority {:?}; new description {:?}",
-                         idx, priority, task_descript);
+                commands::edit_task(path, idx, task_descript, priority)?;
             } else {
                 eprintln!("error: Refer to the task done by its id");
             }

@@ -9,7 +9,7 @@ use std::cmp::Ordering;
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Priority {
     Urgent,
     High,

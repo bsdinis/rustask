@@ -45,3 +45,16 @@ pub fn remove_task(path: &Path, id: usize) -> Result<Task, error::Error> {
     storage::store_tasks(&path, &tasks)?;
     Ok(task)
 }
+
+/// Edit a task
+pub fn edit_task(path: &Path, id: usize, desc: Option<String>, prio: Option<task::Priority>) -> Result<(), error::Error> {
+    let mut tasks = storage::load_tasks(&path)?;
+    if id >= tasks.len() {
+        return Err(error::Error::OutOfBounds(id));
+    }
+
+    tasks[id] = Task::new(desc.unwrap_or(tasks[id].descript.clone()),
+                         prio.or(tasks[id].priority.clone()));
+    storage::store_tasks(&path, &tasks)?;
+    Ok(())
+}
