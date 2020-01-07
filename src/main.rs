@@ -68,6 +68,7 @@ fn main() -> Result<(), commands::error::Error> {
     if !matches.is_present("file") && env::var("RUSTASK_TASKFILE").is_err() {
         eprintln!("Could not find rustask file");
         eprintln!("Maybe set RUSTASK_TASKFILE env var or pass in -f flag");
+        std::process::exit(1);
     }
 
     let task_location = if matches.is_present("file") {
@@ -112,7 +113,8 @@ fn main() -> Result<(), commands::error::Error> {
                 .unwrap();
 
             if let Ok(idx) = sub_matches.value_of("task index").unwrap().parse::<usize>() {
-                commands::remove_task(path, idx)?;
+                let task = commands::remove_task(path, idx)?;
+                println!("finished task {}: {}", idx, task);
             } else {
                 eprintln!("error: Refer to the task done by its id");
             }
