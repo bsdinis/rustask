@@ -17,28 +17,11 @@ fn main() -> Result<(), commands::error::Error> {
                 .help("task file")
                 .takes_value(true),
         )
-        .subcommand(SubCommand::with_name("l").help("List tasks"))
-        .subcommand(SubCommand::with_name("list").help("List tasks"))
-        .subcommand(SubCommand::with_name("la").help("List all tasks"))
-        .subcommand(SubCommand::with_name("listall").help("List all tasks"))
-        .subcommand(
-            SubCommand::with_name("a")
-                .help("Add a task")
-                .arg(
-                    Arg::with_name("task")
-                        .help("the task to be added")
-                        .index(1)
-                        .required(true),
-                )
-                .arg(
-                    Arg::with_name("priority")
-                        .help("priority for the task")
-                        .takes_value(true)
-                        .short("-p"),
-                ),
-        )
+        .subcommand(SubCommand::with_name("list").aliases(&["l"]).help("List tasks"))
+        .subcommand(SubCommand::with_name("listall").aliases(&["la"]).help("List all tasks"))
         .subcommand(
             SubCommand::with_name("add")
+                .aliases(&["a"])
                 .help("Add a task")
                 .arg(
                     Arg::with_name("task")
@@ -52,16 +35,34 @@ fn main() -> Result<(), commands::error::Error> {
                         .takes_value(true)
                         .short("-p"),
                 ),
-        )
-        .subcommand(
-            SubCommand::with_name("d")
-                .help("Conclude the task")
-                .arg(Arg::with_name("task index").index(1).required(true)),
         )
         .subcommand(
             SubCommand::with_name("done")
+                .aliases(&["d"])
                 .help("Conclude the task")
                 .arg(Arg::with_name("task index").index(1).required(true)),
+        )
+        .subcommand(
+            SubCommand::with_name("edit")
+                .aliases(&["e"])
+                .help("Change a task")
+                .arg(
+                    Arg::with_name("task index")
+                        .help("the index of the task to be changed")
+                        .index(1)
+                        .required(true)
+                )
+                .arg(
+                    Arg::with_name("descript")
+                        .help("the new description")
+                        .index(2)
+                )
+                .arg(
+                    Arg::with_name("priority")
+                        .help("priority for the task")
+                        .takes_value(true)
+                        .short("-p"),
+                ),
         )
         .get_matches();
 
@@ -80,13 +81,10 @@ fn main() -> Result<(), commands::error::Error> {
     let path = Path::new(&task_location);
 
     match matches.subcommand_name() {
-        Some("list") | Some("l") => commands::list(path)?,
-        Some("listall") | Some("la") => commands::list_all(path)?,
-        Some("add") | Some("a") => {
-            let sub_matches = matches
-                .subcommand_matches("add")
-                .or(matches.subcommand_matches("a"))
-                .unwrap();
+        Some("list") => commands::list(path)?,
+        Some("listall") => commands::list_all(path)?,
+        Some("add") => {
+            let sub_matches = matches.subcommand_matches("add").unwrap();
             let task_descript = sub_matches
                 .value_of("task")
                 .unwrap()
@@ -106,15 +104,28 @@ fn main() -> Result<(), commands::error::Error> {
                 commands::add_task(path, task)?;
             }
         }
-        Some("done") | Some("d") => {
-            let sub_matches = matches
-                .subcommand_matches("done")
-                .or(matches.subcommand_matches("d"))
-                .unwrap();
+        Some("done") => {
+            let sub_matches = matches.subcommand_matches("done").unwrap();
 
             if let Ok(idx) = sub_matches.value_of("task index").unwrap().parse::<usize>() {
                 let task = commands::remove_task(path, idx)?;
                 println!("finished task {}: {}", idx, task);
+            } else {
+                eprintln!("error: Refer to the task done by its id");
+            }
+        }
+        Some("edit") => {
+            let sub_matches = matches.subcommand_matches("edit").unwrap();
+
+            if let Ok(idx) = sub_matches.value_of("task index").unwrap().parse::<usize>() {
+                let task_descript = sub_matches.value_of("descript")
+                    .and_then(|d_str| d_str.parse::<String>().ok());
+
+                let priority = sub_matches.value_of("priority")
+                    .and_then(|p_str| p_str.parse::<task::Priority>().ok());
+
+                println!("Editing task {}; new priority {:?}; new description {:?}",
+                         idx, priority, task_descript);
             } else {
                 eprintln!("error: Refer to the task done by its id");
             }
