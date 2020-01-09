@@ -60,7 +60,7 @@ pub fn task_f(task: &Task) -> bool {
 impl fmt::Display for Task {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.priority {
-            Some(Priority::Urgent) => write!(f, "{}", self.descript.red().bold()),
+            Some(Priority::Urgent) => write!(f, "{}", self.descript.on_red().bold().bright_white()),
             Some(Priority::High) => write!(f, "{}", self.descript.red()),
             Some(Priority::Normal) => write!(f, "{}", self.descript.yellow()),
             Some(Priority::Low) => write!(f, "{}", self.descript.green()),
