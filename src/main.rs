@@ -8,7 +8,7 @@ use std::{
 
 fn main() -> Result<(), commands::error::Error> {
     let matches = App::new("rustask")
-        .version("0.1")
+        .version("0.2")
         .author("bsdinis <baltasar.dinis@tecnico.ulisboa.pt>")
         .about("Task Manager")
         .arg(
