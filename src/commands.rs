@@ -3,8 +3,10 @@ use std::path::Path;
 pub mod error;
 mod storage;
 pub mod task;
+pub mod project;
 
 use task::{task_f, Task};
+use project::Project;
 
 fn list_filter<F>(path: &Path, op: F) -> Result<(), error::Error>
 where
