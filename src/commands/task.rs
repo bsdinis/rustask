@@ -112,7 +112,7 @@ mod tests {
         let task = Task::new("urgent task".to_string(), Some(Priority::Urgent));
         assert_eq!(
             format!("Urgent Task: {}", task),
-            format!("Urgent Task: {}", "urgent task".red().bold()),
+            format!("Urgent Task: {}", "urgent task".on_red().bold().bright_white()),
         );
     }
 
