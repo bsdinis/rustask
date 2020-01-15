@@ -9,7 +9,7 @@ use super::error;
 
 #[derive(Debug, Serialize, Deserialize, PartialOrd, Ord, PartialEq, Eq)]
 pub struct Project {
-    name: String,
+    pub name: String,
     tasks: Vec<task::Task>,
 }
 
@@ -48,11 +48,15 @@ impl Project {
     pub fn tasks(&self) -> &Vec<task::Task> {
         &self.tasks
     }
+
+    pub fn len(&self) -> usize {
+        self.tasks.len()
+    }
 }
 
 impl fmt::Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}: {} tasks", self.name, self.tasks.len())
+        write!(f, "{}: {} {}", self.name, self.tasks.len(), if self.tasks.len() == 1 {"task"} else {"tasks"})
     }
 }
 

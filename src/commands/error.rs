@@ -8,6 +8,8 @@ use std::fmt;
 pub enum Error {
     IOError(std::io::Error),
     OutOfBounds(usize),
+    ProjectNotFound(String),
+    ProjectNameTaken(String),
     TaskFileNotFound,
     SerializationError,
 }
@@ -29,6 +31,14 @@ impl std::cmp::PartialEq for self::Error {
                 Error::TaskFileNotFound => true,
                 _ => false,
             },
+            Error::ProjectNameTaken(a) => match other {
+                Error::ProjectNameTaken(b) => a == b,
+                _ => false,
+            },
+            Error::ProjectNotFound(a) => match other {
+                Error::ProjectNotFound(b) => a == b,
+                _ => false,
+            },
             Error::SerializationError => match other {
                 Error::SerializationError => true,
                 _ => false,
@@ -43,6 +53,8 @@ impl fmt::Display for self::Error {
             Error::IOError(_) => self.fmt(f),
             Error::OutOfBounds(idx) => write!(f, "Cannot find task {}", idx),
             Error::TaskFileNotFound => write!(f, "Task file not found"),
+            Error::ProjectNotFound(name) => write!(f, "Project {} not found", name),
+            Error::ProjectNameTaken(name) => write!(f, "Project {} already exists", name),
             Error::SerializationError => write!(f, "Serialization Error"),
         }
     }
