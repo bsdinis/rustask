@@ -8,12 +8,12 @@ use std::{
 
 fn main() -> Result<(), commands::error::Error> {
     let matches = App::new("rustask")
-        .version("0.4")
+        .version("0.5")
         .author("bsdinis <baltasar.dinis@tecnico.ulisboa.pt>")
         .about("Task Manager")
         .arg(
             Arg::with_name("file")
-                .short("f")
+                .short("-f")
                 .help("task file")
                 .takes_value(true),
         )
@@ -24,8 +24,7 @@ fn main() -> Result<(), commands::error::Error> {
                 .arg(
                     Arg::with_name("project")
                         .help("project to be listed")
-                        .takes_value(true)
-                        .short("-p"),
+                        .index(1),
                 )
             )
         .subcommand(
@@ -35,8 +34,7 @@ fn main() -> Result<(), commands::error::Error> {
                 .arg(
                     Arg::with_name("project")
                         .help("project to be listed")
-                        .takes_value(true)
-                        .short("-p"),
+                        .index(1),
                 )
             )
         .subcommand(
@@ -45,13 +43,11 @@ fn main() -> Result<(), commands::error::Error> {
                 .help("Rename a project")
                 .arg(Arg::with_name("project")
                         .help("project to rename")
-                        .takes_value(true)
                         .index(1)
                         .required(true)
                 )
                 .arg(Arg::with_name("name")
                         .help("new name")
-                        .takes_value(true)
                         .index(2)
                         .required(true)
                 )
@@ -61,34 +57,34 @@ fn main() -> Result<(), commands::error::Error> {
                 .aliases(&["a"])
                 .help("Add a task")
                 .arg(
-                    Arg::with_name("task")
-                        .help("the task to be added")
-                        .index(1)
-                        .required(true),
-                )
-                .arg(
                     Arg::with_name("project")
                         .help("project to assign the task to")
-                        .takes_value(true)
-                        .short("-p"),
+                        .index(1)
+                        .required(true)
+                )
+                .arg(
+                    Arg::with_name("task")
+                        .help("the task to be added")
+                        .index(2)
+                        .required(true)
                 )
                 .arg(
                     Arg::with_name("priority")
                         .help("priority (urgency) for the task")
                         .takes_value(true)
-                        .short("-u"),
+                        .short("-p"),
                 )
         )
         .subcommand(
             SubCommand::with_name("done")
                 .aliases(&["d"])
                 .help("Conclude the task")
-                .arg(Arg::with_name("task index").index(1).required(true))
                 .arg(Arg::with_name("project")
                         .help("project where the task is assigned to")
-                        .takes_value(true)
-                        .short("-p"),
+                        .index(1)
+                        .required(true)
                 )
+                .arg(Arg::with_name("task index").index(2).required(true))
         )
         .subcommand(
             SubCommand::with_name("move")
@@ -96,19 +92,16 @@ fn main() -> Result<(), commands::error::Error> {
                 .help("Move a task between projects")
                 .arg(Arg::with_name("old project")
                         .help("project where the task is")
-                        .takes_value(true)
                         .index(1)
                         .required(true)
                 )
                 .arg(Arg::with_name("id")
                         .help("id of the task being moved")
-                        .takes_value(true)
                         .index(2)
                         .required(true)
                 )
                 .arg(Arg::with_name("new project")
                         .help("new project for the task")
-                        .takes_value(true)
                         .index(3)
                         .required(true)
                 )
@@ -117,25 +110,25 @@ fn main() -> Result<(), commands::error::Error> {
             SubCommand::with_name("edit")
                 .aliases(&["e"])
                 .help("Change a task")
+                .arg(Arg::with_name("project")
+                        .help("project to where the task assigned to")
+                        .index(1)
+                        .required(true)
+                )
                 .arg(
                     Arg::with_name("task index")
                         .help("the index of the task to be changed")
-                        .index(1)
+                        .index(2)
                         .required(true)
                 )
                 .arg(
                     Arg::with_name("descript")
                         .help("the new description")
-                        .index(2)
+                        .index(3)
                 )
                 .arg(
                     Arg::with_name("priority")
                         .help("priority (urgency) for the task")
-                        .takes_value(true)
-                        .short("-u"),
-                )
-                .arg(Arg::with_name("project")
-                        .help("project to where the task assigned to")
                         .takes_value(true)
                         .short("-p"),
                 )
