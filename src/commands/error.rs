@@ -2,75 +2,57 @@
 //
 // define an error type
 
-use serde_json;
-use std::fmt;
-#[derive(Debug)]
-pub enum Error {
-    IOError(std::io::Error),
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum RustaskError {
+    #[error("Failed to perform IO")]
+    IOError(#[from] std::io::Error),
+
+    #[error("Cannot find task {}", .0)]
     OutOfBounds(usize),
+
+    #[error("Project {} not found", .0)]
     ProjectNotFound(String),
+
+    #[error("Project {} already exists", .0)]
     ProjectNameTaken(String),
-    TaskFileNotFound,
-    SerializationError,
+
+    #[allow(unused)]
+    #[error("Task file `{}` not found", .0)]
+    TaskFileNotFound(String),
+
+    #[error("Failed to serialize")]
+    SerializationError(#[from] serde_json::Error),
 }
 
-impl std::error::Error for self::Error {}
-
-impl std::cmp::PartialEq for self::Error {
-    fn eq(&self, other: &self::Error) -> bool {
+impl std::cmp::PartialEq for RustaskError {
+    fn eq(&self, other: &RustaskError) -> bool {
         match self {
-            Error::IOError(_err) => match other {
-                Error::IOError(_a) => true,
+            RustaskError::IOError(_a) => match other {
+                RustaskError::IOError(_b) => true,
                 _ => false,
             },
-            Error::OutOfBounds(a) => match other {
-                Error::OutOfBounds(b) => a == b,
+            RustaskError::OutOfBounds(a) => match other {
+                RustaskError::OutOfBounds(b) => a == b,
                 _ => false,
             },
-            Error::TaskFileNotFound => match other {
-                Error::TaskFileNotFound => true,
+            RustaskError::TaskFileNotFound(a) => match other {
+                RustaskError::TaskFileNotFound(b) => a == b,
                 _ => false,
             },
-            Error::ProjectNameTaken(a) => match other {
-                Error::ProjectNameTaken(b) => a == b,
+            RustaskError::ProjectNameTaken(a) => match other {
+                RustaskError::ProjectNameTaken(b) => a == b,
                 _ => false,
             },
-            Error::ProjectNotFound(a) => match other {
-                Error::ProjectNotFound(b) => a == b,
+            RustaskError::ProjectNotFound(a) => match other {
+                RustaskError::ProjectNotFound(b) => a == b,
                 _ => false,
             },
-            Error::SerializationError => match other {
-                Error::SerializationError => true,
+            RustaskError::SerializationError(_a) => match other {
+                RustaskError::SerializationError(_b) => true,
                 _ => false,
             },
         }
-    }
-}
-
-impl fmt::Display for self::Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Error::IOError(_) => self.fmt(f),
-            Error::OutOfBounds(idx) => write!(f, "Cannot find task {}", idx),
-            Error::TaskFileNotFound => write!(f, "Task file not found"),
-            Error::ProjectNotFound(name) => write!(f, "Project {} not found", name),
-            Error::ProjectNameTaken(name) => write!(f, "Project {} already exists", name),
-            Error::SerializationError => write!(f, "Serialization Error"),
-        }
-    }
-}
-
-impl From<std::io::Error> for self::Error {
-    fn from(error: std::io::Error) -> Self {
-        match error.kind() {
-            std::io::ErrorKind::NotFound => self::Error::TaskFileNotFound,
-            _ => self::Error::IOError(error),
-        }
-    }
-}
-
-impl From<serde_json::Error> for self::Error {
-    fn from(_: serde_json::Error) -> Self {
-        self::Error::SerializationError
     }
 }
