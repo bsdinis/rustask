@@ -1,12 +1,14 @@
 mod commands;
 use clap::{App, Arg, SubCommand};
-use commands::error::RustaskError;
 use commands::task;
 use std::{env, path::Path};
 
-fn main() -> Result<(), RustaskError> {
+use color_eyre::eyre::Result;
+
+fn main() -> Result<()> {
+    color_eyre::install()?;
     let matches = App::new("rustask")
-        .version("0.6")
+        .version("0.7")
         .author("bsdinis <baltasar.dinis@tecnico.ulisboa.pt>")
         .about("Task Manager")
         .arg(
@@ -161,7 +163,7 @@ fn main() -> Result<(), RustaskError> {
     let task_location = if matches.is_present("file") {
         matches.value_of("file").unwrap().to_string()
     } else {
-        env::var("RUSTASK_TASKFILE").unwrap()
+        env::var("RUSTASK_TASKFILE")?
     };
     let path = Path::new(&task_location);
 
@@ -184,17 +186,9 @@ fn main() -> Result<(), RustaskError> {
         }
         Some("rename") => {
             let sub_matches = matches.subcommand_matches("rename").unwrap();
-            let project = sub_matches
-                .value_of("project")
-                .unwrap()
-                .parse::<String>()
-                .unwrap();
+            let project = sub_matches.value_of("project").unwrap().parse::<String>()?;
 
-            let name = sub_matches
-                .value_of("name")
-                .unwrap()
-                .parse::<String>()
-                .unwrap();
+            let name = sub_matches.value_of("name").unwrap().parse::<String>()?;
 
             commands::rename(path, project, name)?
         }
@@ -203,43 +197,34 @@ fn main() -> Result<(), RustaskError> {
             let old_project = sub_matches
                 .value_of("old project")
                 .unwrap()
-                .parse::<String>()
-                .unwrap();
+                .parse::<String>()?;
 
-            let id = sub_matches
-                .value_of("id")
-                .unwrap()
-                .parse::<usize>()
-                .unwrap();
+            let id = sub_matches.value_of("id").unwrap().parse::<usize>()?;
 
             let new_project = sub_matches
                 .value_of("new project")
                 .unwrap()
-                .parse::<String>()
-                .unwrap();
+                .parse::<String>()?;
 
             commands::move_task(path, old_project, id, new_project)?
         }
         Some("add") => {
             let sub_matches = matches.subcommand_matches("add").unwrap();
-            let task_descript = sub_matches
-                .value_of("task")
-                .unwrap()
-                .parse::<String>()
-                .unwrap();
+            let task_descript = sub_matches.value_of("task").unwrap().parse::<String>()?;
 
             let project = sub_matches
                 .value_of("project")
                 .unwrap_or("")
-                .parse::<String>()
-                .unwrap();
+                .parse::<String>()?;
 
             let priority = sub_matches
                 .value_of("priority")
                 .and_then(|s| s.parse::<task::Priority>().ok());
-            let deadline = sub_matches
-                .value_of("deadline")
-                .map(|s| task::parse_deadline(s).unwrap());
+            let deadline = if let Some(p_str) = sub_matches.value_of("deadline") {
+                Some(task::parse_deadline(p_str)?)
+            } else {
+                None
+            };
 
             let task_b = task::TaskBuilder::new(task_descript);
             let task_b = if let Some(p) = priority {
@@ -259,8 +244,7 @@ fn main() -> Result<(), RustaskError> {
             let project = sub_matches
                 .value_of("project")
                 .unwrap_or("")
-                .parse::<String>()
-                .unwrap();
+                .parse::<String>()?;
 
             if let Ok(idx) = sub_matches.value_of("task index").unwrap().parse::<usize>() {
                 let task = commands::remove_task(path, idx, project)?;
@@ -274,8 +258,7 @@ fn main() -> Result<(), RustaskError> {
             let project = sub_matches
                 .value_of("project")
                 .unwrap_or("")
-                .parse::<String>()
-                .unwrap();
+                .parse::<String>()?;
 
             if let Ok(idx) = sub_matches.value_of("task index").unwrap().parse::<usize>() {
                 let task_descript = sub_matches
@@ -286,11 +269,11 @@ fn main() -> Result<(), RustaskError> {
                     .value_of("priority")
                     .and_then(|p_str| p_str.parse::<task::Priority>().ok());
 
-                let deadline = sub_matches
-                    .value_of("deadline")
-                    .map(|p_str| task::parse_deadline(p_str).unwrap());
-
-                eprintln!("DEADLINE {:?}", deadline);
+                let deadline = if let Some(p_str) = sub_matches.value_of("deadline") {
+                    Some(task::parse_deadline(p_str)?)
+                } else {
+                    None
+                };
 
                 commands::edit_task(path, idx, project, task_descript, priority, deadline)?;
             } else {
