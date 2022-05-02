@@ -176,14 +176,6 @@ fn main() -> Result<()> {
 
             commands::list(path, project)?
         }
-        Some("listall") => {
-            let sub_matches = matches.subcommand_matches("listall").unwrap();
-            let project = sub_matches
-                .value_of("project")
-                .and_then(|s| s.to_string().parse::<String>().ok());
-
-            commands::list_all(path, project)?
-        }
         Some("rename") => {
             let sub_matches = matches.subcommand_matches("rename").unwrap();
             let project = sub_matches.value_of("project").unwrap().parse::<String>()?;
@@ -280,8 +272,16 @@ fn main() -> Result<()> {
                 eprintln!("error: Refer to the task done by its id");
             }
         }
+        Some("listall") => {
+            let sub_matches = matches.subcommand_matches("listall").unwrap();
+            let project = sub_matches
+                .value_of("project")
+                .and_then(|s| s.to_string().parse::<String>().ok());
+
+            commands::list_all(path, project)?
+        }
         _ => {
-            eprintln!("No subcommand supplied");
+            commands::list_all(path, None)?
         }
     };
 
