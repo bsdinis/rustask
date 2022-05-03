@@ -8,7 +8,7 @@ use color_eyre::eyre::Result;
 fn main() -> Result<()> {
     color_eyre::install()?;
     let matches = App::new("rustask")
-        .version("0.7")
+        .version("0.9")
         .author("bsdinis <baltasar.dinis@tecnico.ulisboa.pt>")
         .about("Task Manager")
         .arg(
@@ -229,7 +229,8 @@ fn main() -> Result<()> {
             } else {
                 task_b
             };
-            commands::add_task(path, task_b.build(), project)?;
+            commands::add_task(path, task_b.build(), project.clone())?;
+            commands::list_all(path, Some(project))?;
         }
         Some("done") => {
             let sub_matches = matches.subcommand_matches("done").unwrap();
@@ -239,8 +240,9 @@ fn main() -> Result<()> {
                 .parse::<String>()?;
 
             if let Ok(idx) = sub_matches.value_of("task index").unwrap().parse::<usize>() {
-                let task = commands::remove_task(path, idx, project)?;
+                let task = commands::remove_task(path, idx, project.clone())?;
                 println!("finished task {}: {}", idx, task);
+                commands::list_all(path, Some(project))?
             } else {
                 eprintln!("error: Refer to the task done by its id");
             }
@@ -267,7 +269,15 @@ fn main() -> Result<()> {
                     None
                 };
 
-                commands::edit_task(path, idx, project, task_descript, priority, deadline)?;
+                commands::edit_task(
+                    path,
+                    idx,
+                    project.clone(),
+                    task_descript,
+                    priority,
+                    deadline,
+                )?;
+                commands::list_all(path, Some(project))?
             } else {
                 eprintln!("error: Refer to the task done by its id");
             }
@@ -280,9 +290,7 @@ fn main() -> Result<()> {
 
             commands::list_all(path, project)?
         }
-        _ => {
-            commands::list_all(path, None)?
-        }
+        _ => commands::list_all(path, None)?,
     };
 
     Ok(())
