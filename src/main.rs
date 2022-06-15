@@ -242,7 +242,12 @@ fn main() -> Result<()> {
             if let Ok(idx) = sub_matches.value_of("task index").unwrap().parse::<usize>() {
                 let task = commands::remove_task(path, idx, project.clone())?;
                 println!("finished task {}: {}", idx, task);
-                commands::list_all(path, Some(project))?
+                match commands::list_all(path, Some(project)) {
+                    Err(commands::error::RustaskError::ProjectNotFound(_)) | Ok(_) => {}
+                    Err(e) => {
+                        return Err(e.into());
+                    }
+                }
             } else {
                 eprintln!("error: Refer to the task done by its id");
             }
