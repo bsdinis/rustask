@@ -8,12 +8,12 @@ use color_eyre::eyre::Result;
 fn main() -> Result<()> {
     color_eyre::install()?;
     let matches = App::new("rustask")
-        .version("0.9")
+        .version("0.9.2")
         .author("bsdinis <baltasar.dinis@tecnico.ulisboa.pt>")
         .about("Task Manager")
         .arg(
             Arg::with_name("file")
-                .short("-f")
+                .short('f')
                 .help("task file")
                 .takes_value(true),
         )
@@ -74,13 +74,13 @@ fn main() -> Result<()> {
                     Arg::with_name("priority")
                         .help("priority (urgency) for the task")
                         .takes_value(true)
-                        .short("-p"),
+                        .short('p'),
                 )
                 .arg(
                     Arg::with_name("deadline")
                         .help("deadline of the task")
                         .takes_value(true)
-                        .short("-d"),
+                        .short('d'),
                 ),
         )
         .subcommand(
@@ -143,13 +143,13 @@ fn main() -> Result<()> {
                     Arg::with_name("priority")
                         .help("priority (urgency) for the task")
                         .takes_value(true)
-                        .short("-p"),
+                        .short('p'),
                 )
                 .arg(
                     Arg::with_name("deadline")
                         .help("deadline of the task")
                         .takes_value(true)
-                        .short("-d"),
+                        .short('d'),
                 ),
         )
         .get_matches();
